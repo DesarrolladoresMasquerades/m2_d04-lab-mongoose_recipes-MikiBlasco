@@ -15,9 +15,32 @@ mongoose
   .then(x => {
     console.log(`Connected to the database: "${x.connection.name}"`);
     // Before adding any recipes to the database, let's remove all existing ones
-    return Recipe.deleteMany()
+    Recipe.deleteMany()
+    .then(()=>{
+      Recipe.insertMany(data)
+      .then((response) => {
+        console.log(response.map(el=>el.title))
+        Recipe.findOneAndUpdate({title:"Rigatoni alla Genovese"}, {duration: 100})
+        .then(()=>{
+          console.log('name changed')
+          Recipe.deleteOne({title: "Carrot Cake"})
+          .then(()=>{
+            console.log("carrot cake deleted")
+            mongoose.connection.close();
+          })
+          .catch(error => console.log(error))
+        })  
+        .catch(error => console.log(error))
+    })
+    .catch(error => console.log(error))
   })
-  .then(() => {
+  .catch(error => console.log(error))
+})
+  .catch(error => {
+    console.error('Error connecting to the database', error)
+  });
+
+  /*.then(() => {
     Recipe.create({
       title: "Asian stuff",
       level: "Amateur Chef",
@@ -41,10 +64,5 @@ mongoose
     console.log(data.title)
   })
   })
-  .catch(error => {
-    console.error('Error connecting to the database', error);
-  });
-
-
-
+*/
 
